@@ -1,4 +1,4 @@
-namespace GuitarMan.EnemySystem
+namespace GuitarMan.EnemyBehaviour
 {
     public class EnemySystemConstants
     {

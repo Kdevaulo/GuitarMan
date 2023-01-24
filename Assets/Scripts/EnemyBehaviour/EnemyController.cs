@@ -1,13 +1,10 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 using Cysharp.Threading.Tasks;
 
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
-namespace GuitarMan.EnemySystem
+namespace GuitarMan.EnemyBehaviour
 {
     public class EnemyController
     {

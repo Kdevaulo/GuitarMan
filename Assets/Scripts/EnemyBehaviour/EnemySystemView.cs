@@ -2,9 +2,9 @@
 
 using UnityEngine;
 
-namespace GuitarMan.EnemySystem
+namespace GuitarMan.EnemyBehaviour
 {
-    [AddComponentMenu(nameof(EnemySystem) + "/" + nameof(EnemySystemView))]
+    [AddComponentMenu(nameof(EnemyBehaviour) + "/" + nameof(EnemySystemView))]
     public class EnemySystemView : MonoBehaviour
     {
         [field: SerializeField] public EnemyView EnemyPrefab { get; private set; }

@@ -1,4 +1,4 @@
-using GuitarMan.EnemySystem;
+using GuitarMan.EnemyBehaviour;
 using GuitarMan.Utils;
 
 using UnityEngine;

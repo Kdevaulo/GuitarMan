@@ -5,13 +5,17 @@ using Cysharp.Threading.Tasks;
 
 using DG.Tweening;
 
+using GuitarMan.PlayerBehaviour;
+
 using UnityEngine;
 
-namespace GuitarMan.EnemySystem
+namespace GuitarMan.EnemyBehaviour
 {
-    [AddComponentMenu(nameof(EnemySystem) + "/" + nameof(EnemyView))]
+    [AddComponentMenu(nameof(EnemyBehaviour) + "/" + nameof(EnemyView)),
+     RequireComponent(typeof(Collider), typeof(Rigidbody))]
     public class EnemyView : MonoBehaviour, IDisposable
     {
+        public event Action<EnemyView> PlayerFaced = delegate { };
         public event Action<EnemyView> CameToTarget = delegate { };
         public event Action<EnemyView> CameToShelter = delegate { };
 
@@ -20,6 +24,15 @@ namespace GuitarMan.EnemySystem
         [SerializeField] private Sprite _moneyCaughtSprite;
 
         private CancellationTokenSource _cts = new CancellationTokenSource();
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            collider.TryGetComponent<PlayerView>(out var view);
+
+            PlayerFaced.Invoke(this);
+
+            Debug.Log("PlayerFaced");
+        }
 
         void IDisposable.Dispose()
         {
