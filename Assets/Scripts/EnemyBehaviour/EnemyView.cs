@@ -83,8 +83,6 @@ namespace GuitarMan.EnemyBehaviour
 
             _currentTween = transform.DOMove(targetPosition, duration).SetEase(Ease.Linear).SetSpeedBased();
 
-            Debug.Log(duration);
-
             await _currentTween;
 
             if (!_currentTween.IsActive())
