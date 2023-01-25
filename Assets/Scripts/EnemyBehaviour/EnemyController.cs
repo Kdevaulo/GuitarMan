@@ -62,27 +62,47 @@ namespace GuitarMan.EnemyBehaviour
 
             enemyView.CameToShelter += HandleCameToShelter;
             enemyView.CameToTarget += HandleCameToTarget;
+            enemyView.PlayerEntered += HandlePlayerEntered;
+            enemyView.PlayerExited += HandlePlayerExited;
 
             enemyView.transform.LookAt(_wallet);
-            enemyView.StartMovingToTarget(_wallet.position, EnemySystemConstants.MovingToTargetDuration);
+            enemyView.StartMovingToTarget(_wallet.position, EnemySystemConstants.MovingToTargetSpeed);
         }
 
         private void HandleCameToTarget(EnemyView view)
         {
-            var targetPosition = _positionsByIds[view.GetInstanceID()];
-
             view.SetMoneyCaughtSprite();
-            view.StartMovingToShelter(targetPosition, EnemySystemConstants.MovingToShelterDuration);
+            view.DisableInteraction();
+            view.StartMovingToShelter(GetShelterPosition(view), EnemySystemConstants.MovingToShelterSpeed);
         }
 
         private void HandleCameToShelter(EnemyView view)
         {
             view.gameObject.SetActive(false);
 
+            view.TryKillTween();
+
             view.CameToShelter -= HandleCameToShelter;
             view.CameToTarget -= HandleCameToTarget;
+            view.PlayerEntered -= HandlePlayerEntered;
+            view.PlayerExited -= HandlePlayerExited;
 
             Object.Destroy(view.gameObject);
+        }
+
+        private void HandlePlayerEntered(EnemyView view)
+        {
+            view.StartMovingToShelter(GetShelterPosition(view), EnemySystemConstants.MovingToShelterSpeed);
+        }
+
+        private void HandlePlayerExited(EnemyView view)
+        {
+            view.StartMovingToTarget(_wallet.position, EnemySystemConstants.MovingToTargetSpeed);
+        }
+
+        private Vector3 GetShelterPosition(EnemyView view)
+        {
+            return _positionsByIds[view.GetInstanceID()];
         }
     }
 }

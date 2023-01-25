@@ -15,7 +15,8 @@ namespace GuitarMan.EnemyBehaviour
      RequireComponent(typeof(Collider), typeof(Rigidbody))]
     public class EnemyView : MonoBehaviour, IDisposable
     {
-        public event Action<EnemyView> PlayerFaced = delegate { };
+        public event Action<EnemyView> PlayerEntered = delegate { };
+        public event Action<EnemyView> PlayerExited = delegate { };
         public event Action<EnemyView> CameToTarget = delegate { };
         public event Action<EnemyView> CameToShelter = delegate { };
 
@@ -23,29 +24,47 @@ namespace GuitarMan.EnemyBehaviour
 
         [SerializeField] private Sprite _moneyCaughtSprite;
 
-        private CancellationTokenSource _cts = new CancellationTokenSource();
+        private bool _canInteract = true;
 
-        private void OnTriggerEnter(Collider collider)
+        private Tween _currentTween;
+
+        private void OnTriggerEnter(Collider target)
         {
-            collider.TryGetComponent<PlayerView>(out var view);
+            TryInvokeCollisionEvent(target, PlayerEntered);
+        }
 
-            PlayerFaced.Invoke(this);
-
-            Debug.Log("PlayerFaced");
+        private void OnTriggerExit(Collider target)
+        {
+            TryInvokeCollisionEvent(target, PlayerExited);
         }
 
         void IDisposable.Dispose()
         {
-            DisposeToken();
-            _cts = null;
+            TryKillTween();
+            _currentTween = null;
 
+            PlayerEntered = null;
+            PlayerExited = null;
             CameToTarget = null;
             CameToShelter = null;
+        }
+
+        public void TryKillTween()
+        {
+            if (_currentTween.IsActive())
+            {
+                _currentTween.Kill();
+            }
         }
 
         public void SetMoneyCaughtSprite()
         {
             _enemyRenderer.sprite = _moneyCaughtSprite;
+        }
+
+        public void DisableInteraction()
+        {
+            _canInteract = false;
         }
 
         public void StartMovingToTarget(Vector3 targetPosition, float duration)
@@ -58,25 +77,27 @@ namespace GuitarMan.EnemyBehaviour
             MoveToTargetAsync(targetPosition, duration, CameToShelter).Forget();
         }
 
-        public void TryRefreshToken()
-        {
-            DisposeToken();
-            _cts = new CancellationTokenSource();
-        }
-
         private async UniTask MoveToTargetAsync(Vector3 targetPosition, float duration, Action<EnemyView> action)
         {
-            await transform.DOMove(targetPosition, duration).SetEase(Ease.Linear).WithCancellation(_cts.Token);
+            TryKillTween();
 
-            action.Invoke(this);
+            _currentTween = transform.DOMove(targetPosition, duration).SetEase(Ease.Linear).SetSpeedBased();
+
+            Debug.Log(duration);
+
+            await _currentTween;
+
+            if (!_currentTween.IsActive())
+            {
+                action.Invoke(this);
+            }
         }
 
-        private void DisposeToken()
+        private void TryInvokeCollisionEvent(Collider target, Action<EnemyView> collisionEvent)
         {
-            if (_cts != null && !_cts.IsCancellationRequested)
+            if (_canInteract && target.TryGetComponent<PlayerView>(out _))
             {
-                _cts.Cancel();
-                _cts.Dispose();
+                collisionEvent.Invoke(this);
             }
         }
     }
