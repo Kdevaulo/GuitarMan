@@ -5,7 +5,9 @@ namespace GuitarMan.PlayerBehaviour
     [AddComponentMenu(nameof(PlayerBehaviour) + "/" + nameof(KeyboardInputHandler))]
     public class KeyboardInputHandler : MonoBehaviour
     {
-        [SerializeField] private PlayerNavigation playerNavigation;
+        [SerializeField] private PlayerNavigation _playerNavigation;
+
+        [SerializeField] private PlayerAnimation _playerAnimation;
 
         private void Update()
         {
@@ -14,8 +16,10 @@ namespace GuitarMan.PlayerBehaviour
 
             var direction = new Vector3(horizontal, 0, vertical);
 
-            playerNavigation.Move(direction);
-            playerNavigation.Rotate(direction);
+            _playerNavigation.Move(direction);
+            _playerNavigation.Rotate(direction);
+            
+            _playerAnimation.Move(direction);
         }
     }
 }
