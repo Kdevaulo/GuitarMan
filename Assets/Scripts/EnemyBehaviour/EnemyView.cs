@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 
 using Cysharp.Threading.Tasks;
 
@@ -15,10 +14,10 @@ namespace GuitarMan.EnemyBehaviour
      RequireComponent(typeof(Collider), typeof(Rigidbody))]
     public class EnemyView : MonoBehaviour, IDisposable
     {
-        public event Action<EnemyView> PlayerEntered = delegate { };
-        public event Action<EnemyView> PlayerExited = delegate { };
-        public event Action<EnemyView> CameToTarget = delegate { };
-        public event Action<EnemyView> CameToShelter = delegate { };
+        public event Action PlayerEntered = delegate { };
+        public event Action PlayerExited = delegate { };
+        public event Action CameToTarget = delegate { };
+        public event Action CameToShelter = delegate { };
 
         [SerializeField] private SpriteRenderer _enemyRenderer;
 
@@ -77,7 +76,7 @@ namespace GuitarMan.EnemyBehaviour
             MoveToTargetAsync(targetPosition, duration, CameToShelter).Forget();
         }
 
-        private async UniTask MoveToTargetAsync(Vector3 targetPosition, float duration, Action<EnemyView> action)
+        private async UniTask MoveToTargetAsync(Vector3 targetPosition, float duration, Action action)
         {
             TryKillTween();
 
@@ -87,15 +86,15 @@ namespace GuitarMan.EnemyBehaviour
 
             if (!_currentTween.IsActive())
             {
-                action.Invoke(this);
+                action.Invoke();
             }
         }
 
-        private void TryInvokeCollisionEvent(Collider target, Action<EnemyView> collisionEvent)
+        private void TryInvokeCollisionEvent(Collider target, Action collisionEvent)
         {
             if (_canInteract && target.TryGetComponent<PlayerView>(out _))
             {
-                collisionEvent.Invoke(this);
+                collisionEvent.Invoke();
             }
         }
     }

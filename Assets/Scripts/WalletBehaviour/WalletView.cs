@@ -3,6 +3,7 @@ using UnityEngine.UI;
 
 namespace GuitarMan.WalletBehaviour
 {
+    [AddComponentMenu(nameof(WalletBehaviour) + "/" + nameof(WalletView))]
     public class WalletView : MonoBehaviour
     {
         [SerializeField] private Text _currentMoneyText;

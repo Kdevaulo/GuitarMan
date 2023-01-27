@@ -249,6 +249,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _enemySystemView: {fileID: 810675736}
+  _walletView: {fileID: 742318125}
   _wallet: {fileID: 1743024900}
 --- !u!1 &473077751
 GameObject:
@@ -429,6 +430,7 @@ GameObject:
   - component: {fileID: 742318124}
   - component: {fileID: 742318123}
   - component: {fileID: 742318122}
+  - component: {fileID: 742318125}
   m_Layer: 5
   m_Name: WalletCanvas
   m_TagString: Untagged
@@ -516,6 +518,19 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 100
   m_TargetDisplay: 0
+--- !u!114 &742318125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 742318120}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dce4bf8b6094e5b95c5ece9958ea00d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _currentMoneyText: {fileID: 2028808134}
 --- !u!1 &810675735
 GameObject:
   m_ObjectHideFlags: 0
@@ -1180,7 +1195,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -29.7, y: 0}
+  m_AnchoredPosition: {x: -29.699997, y: 0}
   m_SizeDelta: {x: 195, y: 60}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!114 &2028808134

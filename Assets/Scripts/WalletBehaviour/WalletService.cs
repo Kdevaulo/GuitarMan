@@ -3,17 +3,15 @@ using UnityEngine.Assertions;
 
 namespace GuitarMan.WalletBehaviour
 {
-    public class WalletController
+    public class WalletService
     {
         private readonly WalletView _walletView;
 
-        private int _currentMoneyValue = 1000;
+        private int _currentMoneyValue;
 
-        public WalletController(WalletView walletView)
+        public WalletService(WalletView walletView)
         {
             _walletView = walletView;
-
-            UpdateShowingValue(); // todo: remove
         }
 
         public void AddMoney(int value)
