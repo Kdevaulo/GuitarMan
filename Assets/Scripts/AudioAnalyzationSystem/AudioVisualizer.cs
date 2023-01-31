@@ -14,9 +14,11 @@ namespace GuitarMan.AudioAnalyzationSystem
 
         [SerializeField] private bool _useSmooth;
 
-        [SerializeField] private int _scaleMultiplier;
+        [SerializeField] private float _scaleMultiplier = 1;
 
-        [SerializeField] private int _startScale;
+        [SerializeField] private float _startScale = 1;
+
+        private const float PositionMultiplier = 0.0128f;
 
         private void Awake()
         {
@@ -47,7 +49,8 @@ namespace GuitarMan.AudioAnalyzationSystem
                 {
                     var localPosition = _transforms[i].localPosition;
 
-                    _transforms[i].localPosition = new Vector3(localPosition.x, dynamicScale / 2, localPosition.z);
+                    _transforms[i].localPosition = new Vector3(localPosition.x, dynamicScale * PositionMultiplier,
+                        localPosition.z);
                 }
             }
         }
