@@ -8,7 +8,7 @@ namespace GuitarMan.AudioAnalyzationSystem
     {
         [SerializeField] private Transform[] _transforms;
 
-        [SerializeField] private AudioAnalyzer _audioAnalyzer;
+        [SerializeField] private AudioAnalyzer8Groups _audioAnalyzer;
 
         [SerializeField] private bool _oneDirectionScale;
 
@@ -49,8 +49,8 @@ namespace GuitarMan.AudioAnalyzationSystem
                 {
                     var localPosition = _transforms[i].localPosition;
 
-                    _transforms[i].localPosition = new Vector3(localPosition.x, dynamicScale * PositionMultiplier,
-                        localPosition.z);
+                    _transforms[i].localPosition = new Vector3(localPosition.x,
+                        dynamicScale * PositionMultiplier, localPosition.z);
                 }
             }
         }
