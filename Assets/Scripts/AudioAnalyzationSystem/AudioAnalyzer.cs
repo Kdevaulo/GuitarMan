@@ -1,157 +1,84 @@
-using GuitarMan.Utils;
-
 using UnityEngine;
 
 namespace GuitarMan.AudioAnalyzationSystem
 {
-    public static class AudioAnalyzer
+    [AddComponentMenu(nameof(AudioAnalyzationSystem) + "/" + nameof(AudioAnalyzer))]
+    public class AudioAnalyzer : MonoBehaviour
     {
-        public static void CreateFrequencyFor8Groups(ref float[] frequencyValues, in float[] leftChannelSamples,
-            in float[] rightChannelSamples)
+        public float Amplitude => _amplitude;
+        public float SmoothAmplitude => _smoothAmplitude;
+        public float[] FrequencyValues => _frequencyValues;
+        public float[] SmoothValues => _smoothValues;
+        public float[] NormalizedFrequencyValues => _normalizedFrequencyValues;
+        public float[] NormalizedSmoothValues => _normalizedSmoothValues;
+
+        [SerializeField, Range(0.5f, 0.99f)] private float _smoothnessCoefficient = 0.95f;
+
+        [SerializeField] private Groups _groups;
+
+        [SerializeField] private AudioSource _audioSource;
+
+        private readonly float[] _leftChannelSamples = new float[512];
+
+        private readonly float[] _rightChannelSamples = new float[512];
+
+        private float[] _frequencyValues;
+
+        private float[] _smoothValues;
+
+        private float[] _bufferGroupDecrease;
+
+        private float[] _normalizedSmoothValues;
+
+        private float[] _normalizedFrequencyValues;
+
+        private float[] _highestValues;
+
+        private float _amplitude;
+
+        private float _smoothAmplitude;
+
+        private float _highestAmplitude;
+
+        private void Awake()
         {
-            const int groupsCount = 8;
-            const float frequencyScale = 10;
+            var groupsCount = (int) _groups;
 
-            var counter = 0;
+            _frequencyValues = new float[groupsCount];
 
-            for (int i = 0; i < groupsCount; i++)
+            _smoothValues = new float[groupsCount];
+
+            _bufferGroupDecrease = new float[groupsCount];
+
+            _normalizedSmoothValues = new float[groupsCount];
+
+            _normalizedFrequencyValues = new float[groupsCount];
+
+            _highestValues = new float[groupsCount];
+        }
+
+        private void Start()
+        {
+            // note: initialize highest values array with 1f for fixing start max values bug
+            for (var i = 0; i < _highestValues.Length; i++)
             {
-                var samplesCount = (int) Mathf.Pow(2, i + 1);
-
-                var average = 0f;
-
-                if (i == groupsCount - 1)
-                {
-                    samplesCount += 2;
-                    // note: addition 2 bytes to last group is hack to cover 512 bytes at all instead of 510
-                }
-
-                for (int k = 0; k < samplesCount; k++)
-                {
-                    average += leftChannelSamples[counter] + rightChannelSamples[counter] * (counter + 1);
-                    counter++;
-                }
-
-                average /= counter;
-                frequencyValues[i] = average * frequencyScale;
+                _highestValues[i] = 1f;
             }
         }
 
-        public static void CreateFrequencyFor64Groups(ref float[] frequencyValues, in float[] leftChannelSamples,
-            in float[] rightChannelSamples)
+        private void FixedUpdate()
         {
-            const int groupsCount = 64;
-            const float frequencyScale = 80;
+            _audioSource.GetSpectrumData(_leftChannelSamples, 0, FFTWindow.Blackman);
+            _audioSource.GetSpectrumData(_rightChannelSamples, 1, FFTWindow.Blackman);
 
-            var power = 0;
-            var counter = 0;
-            var samplesCount = 1;
-
-            for (int i = 0; i < groupsCount; i++)
-            {
-                var average = 0f;
-
-                if (i == 16 || i == 32 || i == 40 || i == 48 || i == 56)
-                {
-                    samplesCount = (int) Mathf.Pow(2, ++power);
-                    if (power == 3)
-                    {
-                        samplesCount -= 2;
-                        // note: hack to use 6 samples instead of 8 (to avoid using more than 512 samples)
-                    }
-                }
-
-                for (int k = 0; k < samplesCount; k++)
-                {
-                    average += leftChannelSamples[counter] + rightChannelSamples[counter] * (counter + 1);
-                    counter++;
-                }
-
-                average /= counter;
-                frequencyValues[i] = average * frequencyScale;
-            }
-        }
-
-        public static void CreateSmoothValuesGroups(ref float[] smoothValues, ref float[] bufferGroupDecrease,
-            in float[] frequencyValues, float smoothnessCoefficient)
-        {
-            const float decreaseValue = 0.005f;
-
-            var groupsCount = smoothValues.Length;
-
-            ArrayUtils.CheckingForEqualArraysLengths(groupsCount, bufferGroupDecrease.Length,
-                frequencyValues.Length);
-
-            for (int i = 0; i < groupsCount; i++)
-            {
-                var currentFrequency = frequencyValues[i];
-                var currentSmooth = smoothValues[i];
-
-                if (currentFrequency > currentSmooth)
-                {
-                    smoothValues[i] = currentFrequency;
-                    bufferGroupDecrease[i] = decreaseValue;
-                }
-                else
-                {
-                    bufferGroupDecrease[i] = (bufferGroupDecrease[i] - currentFrequency) / groupsCount;
-                    smoothValues[i] = smoothnessCoefficient * currentSmooth +
-                                      (1 - smoothnessCoefficient) * currentFrequency;
-                }
-            }
-        }
-
-        public static void CreateNormalizedValuesGroups(ref float[] highestValues,
-            ref float[] normalizedFrequencyValues,
-            ref float[] normalizedSmoothValues, in float[] frequencyValues, in float[] smoothValues)
-        {
-            var groupsCount = highestValues.Length;
-
-            ArrayUtils.CheckingForEqualArraysLengths(groupsCount, normalizedFrequencyValues.Length,
-                normalizedSmoothValues.Length, frequencyValues.Length, smoothValues.Length);
-
-            for (int i = 0; i < groupsCount; i++)
-            {
-                var currentFrequency = frequencyValues[i];
-                var currentMax = highestValues[i];
-
-                if (currentFrequency > currentMax)
-                {
-                    highestValues[i] = currentMax = currentFrequency;
-                }
-
-                if (currentMax != 0)
-                {
-                    normalizedFrequencyValues[i] = currentFrequency / currentMax;
-                    normalizedSmoothValues[i] = smoothValues[i] / currentMax;
-                }
-            }
-        }
-
-        public static void CreateAmplitudes(ref float amplitude, ref float smoothAmplitude, ref float highestAmplitude,
-            in float[] frequencyValues, in float[] smoothValues)
-        {
-            var groupsCount = frequencyValues.Length;
-
-            ArrayUtils.CheckingForEqualArraysLengths(groupsCount, smoothValues.Length);
-
-            var currentSmoothAmplitude = 0f;
-            var currentAmplitude = 0f;
-
-            for (int i = 0; i < groupsCount; i++)
-            {
-                currentSmoothAmplitude += smoothValues[i];
-
-                currentAmplitude += frequencyValues[i];
-            }
-
-            if (highestAmplitude < currentAmplitude)
-            {
-                highestAmplitude = currentAmplitude;
-            }
-
-            amplitude = currentAmplitude / highestAmplitude;
-            smoothAmplitude = currentSmoothAmplitude / highestAmplitude;
+            AudioAnalyzerUtils.CreateFrequencyForGroups(ref _frequencyValues, _leftChannelSamples, _rightChannelSamples,
+                _groups);
+            AudioAnalyzerUtils.CreateSmoothValuesGroups(ref _smoothValues, ref _bufferGroupDecrease, _frequencyValues,
+                _smoothnessCoefficient);
+            AudioAnalyzerUtils.CreateNormalizedValuesGroups(ref _highestValues, ref _normalizedFrequencyValues,
+                ref _normalizedSmoothValues, _frequencyValues, _smoothValues);
+            AudioAnalyzerUtils.CreateAmplitudes(ref _amplitude, ref _smoothAmplitude, ref _highestAmplitude,
+                _frequencyValues, _smoothValues);
         }
     }
 }

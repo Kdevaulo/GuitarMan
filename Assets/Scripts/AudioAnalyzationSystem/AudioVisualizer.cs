@@ -8,7 +8,7 @@ namespace GuitarMan.AudioAnalyzationSystem
     {
         [SerializeField] private Transform[] _transforms;
 
-        [SerializeField] private AudioAnalyzer8Groups _audioAnalyzer;
+        [SerializeField] private AudioAnalyzer _audioAnalyzer;
 
         [SerializeField] private bool _oneDirectionScale;
 
