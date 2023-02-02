@@ -7,8 +7,8 @@ using UnityEngine;
 
 namespace GuitarMan
 {
-    [AddComponentMenu(nameof(GuitarMan) + "/" + nameof(StartupLifeTimeScope))]
-    public class StartupLifeTimeScope : MonoBehaviour
+    [AddComponentMenu(nameof(GuitarMan) + "/" + nameof(GameStartup))]
+    public class GameStartup : MonoBehaviour
     {
         [SerializeField] private EnemySystemView _enemySystemView;
 

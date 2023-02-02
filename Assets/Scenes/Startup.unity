@@ -238,7 +238,7 @@ GameObject:
   - component: {fileID: 206271532}
   - component: {fileID: 206271533}
   m_Layer: 0
-  m_Name: StartupLifeTimeScope
+  m_Name: GameStartup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -947,6 +947,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _smoothnessCoefficient: 0.8
+  _groups: 8
   _audioSource: {fileID: 971228805}
 --- !u!1 &705507993
 GameObject:
