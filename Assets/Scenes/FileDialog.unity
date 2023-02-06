@@ -857,7 +857,6 @@ MonoBehaviour:
   _loadFilesButton: {fileID: 1015178806}
   _loadingInProgressIcon: {fileID: 441914718}
   _loadedIcon: {fileID: 1852803653}
-  AudioSource: {fileID: 624782599}
 --- !u!1 &1782372697
 GameObject:
   m_ObjectHideFlags: 0

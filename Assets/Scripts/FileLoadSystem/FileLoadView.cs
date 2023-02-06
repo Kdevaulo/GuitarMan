@@ -1,5 +1,4 @@
 using System;
-using System.Threading;
 
 using Cysharp.Threading.Tasks;
 
@@ -21,11 +20,7 @@ namespace GuitarMan.FileLoadSystem
 
         [SerializeField] private GameObject _loadedIcon;
 
-        public AudioSource AudioSource;
-        
         private readonly Vector3 _loadingRotation = new Vector3(0f, 0f, -360f);
-
-        private CancellationTokenSource _cts;
 
         private Tween _currentTween;
 
@@ -36,13 +31,6 @@ namespace GuitarMan.FileLoadSystem
 
         void IDisposable.Dispose()
         {
-            if (_cts != null && !_cts.IsCancellationRequested)
-            {
-                _cts.Cancel();
-                _cts.Dispose();
-                _cts = null;
-            }
-
             _loadFilesButton.onClick.RemoveListener(HandleButtonClick);
         }
 
