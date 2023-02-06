@@ -22,6 +22,8 @@ namespace GuitarMan.AudioAnalyzationSystem
 
         private readonly float[] _rightChannelSamples = new float[512];
 
+        private readonly float[] _multiChannelSamples = new float[512];
+
         private float[] _frequencyValues;
 
         private float[] _smoothValues;
@@ -68,10 +70,28 @@ namespace GuitarMan.AudioAnalyzationSystem
 
         private void FixedUpdate()
         {
-            _audioSource.GetSpectrumData(_leftChannelSamples, 0, FFTWindow.Blackman);
-            _audioSource.GetSpectrumData(_rightChannelSamples, 1, FFTWindow.Blackman);
+            // todo: change to offline method
+            _audioSource.GetSpectrumData(_leftChannelSamples, 0, FFTWindow.Hanning);
+            _audioSource.GetSpectrumData(_rightChannelSamples, 1, FFTWindow.Hanning);
 
-            AudioAnalyzerUtils.CreateFrequencyForGroups(ref _frequencyValues, _leftChannelSamples, _rightChannelSamples,
+            int numProcessed = 0;
+            float combinedChannelAverage = 0f;
+            var numChannels = _audioSource.clip.channels;
+
+            for (int i = 0; i < _leftChannelSamples.Length; i++)
+            {
+                combinedChannelAverage += _leftChannelSamples[i] + _rightChannelSamples[i];
+
+                // Each time we have processed all channels samples for a point in time, we will store the average of the channels combined
+                if ((i + 1) % numChannels == 0)
+                {
+                    _multiChannelSamples[numProcessed] = combinedChannelAverage / numChannels;
+                    numProcessed++;
+                    combinedChannelAverage = 0f;
+                }
+            }
+
+            AudioAnalyzerUtils.CreateFrequencyForGroups(ref _frequencyValues, _multiChannelSamples,
                 _groups);
             AudioAnalyzerUtils.CreateSmoothValuesGroups(ref _smoothValues, ref _bufferGroupDecrease, _frequencyValues,
                 _smoothnessCoefficient);

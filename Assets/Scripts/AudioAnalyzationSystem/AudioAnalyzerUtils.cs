@@ -6,8 +6,8 @@ namespace GuitarMan.AudioAnalyzationSystem
 {
     public static class AudioAnalyzerUtils
     {
-        public static void CreateFrequencyForGroups(ref float[] frequencyValues, in float[] leftChannelSamples,
-            in float[] rightChannelSamples, Groups groups)
+        public static void CreateFrequencyForGroups(ref float[] frequencyValues, in float[] multiChannelSamples,
+            Groups groups)
         {
             var currentCount = (int) groups;
             var samplesCount = 0;
@@ -33,7 +33,7 @@ namespace GuitarMan.AudioAnalyzationSystem
 
                         for (int k = 0; k < samplesCount; k++)
                         {
-                            average += leftChannelSamples[counter] + rightChannelSamples[counter] * (counter + 1);
+                            average += multiChannelSamples[counter] * (counter + 1);
                             counter++;
                         }
 
@@ -66,7 +66,7 @@ namespace GuitarMan.AudioAnalyzationSystem
 
                         for (int k = 0; k < samplesCount; k++)
                         {
-                            average += leftChannelSamples[counter] + rightChannelSamples[counter] * (counter + 1);
+                            average += multiChannelSamples[counter] * (counter + 1);
                             counter++;
                         }
 

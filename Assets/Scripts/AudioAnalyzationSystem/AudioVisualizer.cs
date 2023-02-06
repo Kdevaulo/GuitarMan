@@ -1,3 +1,5 @@
+using System;
+
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -20,7 +22,7 @@ namespace GuitarMan.AudioAnalyzationSystem
 
         private const float PositionMultiplier = 0.0128f;
 
-        private void Awake()
+        private void Start()
         {
             Assert.IsNotNull(_audioAnalyzer);
             Assert.IsTrue(_useSmooth
