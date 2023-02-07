@@ -1,12 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Threading;
 
 using Cysharp.Threading.Tasks;
 
 using DSPLib;
 
+using GuitarMan.Utils;
+
 using SimpleFileBrowser;
+
+using TMPro;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -21,9 +26,18 @@ namespace GuitarMan.FileLoadSystem
 
         private List<SoundSpectrumData> _soundDataCollection = new List<SoundSpectrumData>();
 
+        private List<SpectrumData> _spectrumDataCollection;
+
+        private Transform _loadedFilesContainer;
+
+        private TextMeshProUGUI _songViewPrefab;
+
         public FileLoadController(FileLoadView fileLoadView)
         {
             _fileLoadView = fileLoadView;
+            _loadedFilesContainer = _fileLoadView.GetLoadedFilesContainer();
+            _songViewPrefab = _fileLoadView.GetSongViewPrefab();
+
             fileLoadView.LoadButtonClicked += HandleLoadButtonClick;
         }
 
@@ -57,19 +71,6 @@ namespace GuitarMan.FileLoadSystem
             _fileLoadView.VisualizeLoadFinished();
         }
 
-        private List<SpectrumData> AnalyzeSound(AudioClip audioClip)
-        {
-            audioClip.LoadAudioData();
-
-            var numChannels = audioClip.channels;
-            var numTotalSamples = audioClip.samples;
-
-            float[] samples = new float[numTotalSamples * numChannels];
-            audioClip.GetData(samples, 0);
-
-            return GetSpectrumDataCollection(ref samples, numChannels, numTotalSamples, audioClip.frequency);
-        }
-
         private async UniTask AnalyzeFilesAsync(string[] paths)
         {
             _fileLoadView.VisualizeLoadStarted();
@@ -78,25 +79,57 @@ namespace GuitarMan.FileLoadSystem
             {
                 await TryLoadFileAsync(path);
 
-                _soundDataCollection.Add(new SoundSpectrumData(_loadedSound, AnalyzeSound(_loadedSound)));
+                await AnalyzeSoundAsync();
+
+                _soundDataCollection.Add(new SoundSpectrumData(_loadedSound, _spectrumDataCollection));
+
+                CreateSongView(_loadedSound.name);
             }
 
             _fileLoadView.VisualizeLoadFinished();
         }
 
+        private async UniTask AnalyzeSoundAsync()
+        {
+            var numChannels = _loadedSound.channels;
+            var numTotalSamples = _loadedSound.samples;
+            var frequency = _loadedSound.frequency;
+
+            var samples = new float[numTotalSamples * numChannels];
+            _loadedSound.GetData(samples, 0);
+
+            var thread = new Thread(() => SetSpectrumData(ref samples, numChannels, numTotalSamples, frequency));
+
+            thread.Start();
+
+            await UniTask.WaitUntil(() => thread.ThreadState == ThreadState.Stopped);
+        }
+
+        private void SetSpectrumData(ref float[] samples, int numChannels, int numTotalSamples, int frequency)
+        {
+            _spectrumDataCollection =
+                GetSpectrumDataCollection(ref samples, numChannels, numTotalSamples, frequency);
+        }
+
         private async UniTask TryLoadFileAsync(string path)
         {
-            path = UnityWebRequest.EscapeURL(path);
+            var urlPath = UnityWebRequest.EscapeURL(path);
 
             using (UnityWebRequest unityWebRequest =
-                   UnityWebRequestMultimedia.GetAudioClip("file:///" + path, AudioType.UNKNOWN))
+                   UnityWebRequestMultimedia.GetAudioClip("file:///" + urlPath, AudioType.UNKNOWN))
             {
                 var request = unityWebRequest.SendWebRequest();
 
                 await request;
 
                 _loadedSound = DownloadHandlerAudioClip.GetContent(unityWebRequest);
+                _loadedSound.name = RegexUtils.GetSoundName(path);
             }
+
+            // todo: needed to load audio data async, 400ms is a large freeze maybe AudioClip.loadInBackground will help
+            _loadedSound.LoadAudioData();
+
+            await UniTask.WaitUntil(() => _loadedSound.loadState == AudioDataLoadState.Loaded);
         }
 
         private List<SpectrumData> GetSpectrumDataCollection(ref float[] samples, int numChannels, int numTotalSamples,
@@ -104,9 +137,6 @@ namespace GuitarMan.FileLoadSystem
         {
             try
             {
-                List<SpectrumData> data = new List<SpectrumData>();
-
-                // We only need to retain the samples for combined channels over the time domain
                 float[] preProcessedSamples = new float[numTotalSamples];
 
                 int numProcessed = 0;
@@ -115,7 +145,6 @@ namespace GuitarMan.FileLoadSystem
                 {
                     combinedChannelAverage += samples[i];
 
-                    // Each time we have processed all channels samples for a point in time, we will store the average of the channels combined
                     if ((i + 1) % numChannels == 0)
                     {
                         preProcessedSamples[numProcessed] = combinedChannelAverage / numChannels;
@@ -124,9 +153,10 @@ namespace GuitarMan.FileLoadSystem
                     }
                 }
 
-                // Once we have our audio sample data prepared, we can execute an FFT to return the spectrum data over the time domain
                 const int spectrumSampleSize = 1024;
                 int iterations = preProcessedSamples.Length / spectrumSampleSize;
+
+                List<SpectrumData> data = new List<SpectrumData>(iterations);
 
                 FFT fft = new FFT();
                 fft.Initialize(spectrumSampleSize);
@@ -135,20 +165,16 @@ namespace GuitarMan.FileLoadSystem
 
                 for (int i = 0; i < iterations; i++)
                 {
-                    // Grab the current 1024 chunk of audio sample data
                     Array.Copy(preProcessedSamples, i * spectrumSampleSize, sampleChunk, 0, spectrumSampleSize);
 
-                    // Apply our chosen FFT Window
                     double[] windowCoefs = DSP.Window.Coefficients(DSP.Window.Type.Hanning, spectrumSampleSize);
                     double[] scaledSpectrumChunk = DSP.Math.Multiply(sampleChunk, windowCoefs);
                     double scaleFactor = DSP.Window.ScaleFactor.Signal(windowCoefs);
 
-                    // Perform the FFT and convert output (complex numbers) to Magnitude
                     Complex[] fftSpectrum = fft.Execute(scaledSpectrumChunk);
                     double[] scaledFFTSpectrum = DSP.ConvertComplex.ToMagnitude(fftSpectrum);
                     scaledFFTSpectrum = DSP.Math.Multiply(scaledFFTSpectrum, scaleFactor);
 
-                    // These 1024 magnitude values correspond (roughly) to a single point in the audio timeline
                     float curSongTime = GetTimeFromIndex(i, sampleRate) * spectrumSampleSize;
 
                     data.Add(new SpectrumData(Array.ConvertAll(scaledFFTSpectrum, x => (float) x), curSongTime));
@@ -158,7 +184,6 @@ namespace GuitarMan.FileLoadSystem
             }
             catch (Exception e)
             {
-                // Catch exceptions here since the background thread won't always surface the exception to the main thread
                 Debug.Log(e.ToString());
                 return null;
             }
@@ -167,6 +192,13 @@ namespace GuitarMan.FileLoadSystem
         private float GetTimeFromIndex(int index, int sampleRate)
         {
             return 1f / sampleRate * index;
+        }
+
+        private void CreateSongView(string targetName)
+        {
+            // todo: add dynamic scroll area update while adding new item
+            var songView = UnityEngine.Object.Instantiate(_songViewPrefab, _loadedFilesContainer);
+            songView.text = targetName;
         }
     }
 }
