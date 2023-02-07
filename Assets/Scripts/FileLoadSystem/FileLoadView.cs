@@ -22,10 +22,6 @@ namespace GuitarMan.FileLoadSystem
 
         [SerializeField] private GameObject _loadedIcon;
 
-        [SerializeField] private Transform _loadedFilesContainer;
-
-        [SerializeField] private TextMeshProUGUI _songViewPrefab;
-
         private readonly Vector3 _loadingRotation = new Vector3(0f, 0f, -360f);
 
         private Tween _currentTween;
@@ -52,16 +48,6 @@ namespace GuitarMan.FileLoadSystem
             SwitchIcon(false);
 
             VisualizeLoadingAsync().Forget();
-        }
-
-        public Transform GetLoadedFilesContainer()
-        {
-            return _loadedFilesContainer;
-        }
-
-        public TextMeshProUGUI GetSongViewPrefab()
-        {
-            return _songViewPrefab;
         }
 
         private async UniTask VisualizeLoadingAsync()

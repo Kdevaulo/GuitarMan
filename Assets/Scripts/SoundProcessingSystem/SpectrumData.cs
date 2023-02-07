@@ -1,4 +1,4 @@
-namespace GuitarMan.FileLoadSystem
+namespace GuitarMan.SoundProcessingSystem
 {
     public class SpectrumData
     {

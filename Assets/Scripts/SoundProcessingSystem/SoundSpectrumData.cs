@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-namespace GuitarMan.FileLoadSystem
+namespace GuitarMan.SoundProcessingSystem
 {
     public class SoundSpectrumData
     {
