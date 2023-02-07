@@ -501,6 +501,7 @@ GameObject:
   - component: {fileID: 1014909378}
   - component: {fileID: 1014909377}
   - component: {fileID: 1014909379}
+  - component: {fileID: 1014909380}
   m_Layer: 5
   m_Name: FilesContainer
   m_TagString: Untagged
@@ -609,6 +610,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding: {x: 0, y: 0, z: 0, w: 0}
   m_Softness: {x: 0, y: 0}
+--- !u!114 &1014909380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014909374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3791e308ec0e430abeb79620bc7ee569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <SoundViewPrefab>k__BackingField: {fileID: 6579752991045132540, guid: 191e1b1ba295d724b81ee0675c1e3e50,
+    type: 3}
+  <LoadedFilesContainer>k__BackingField: {fileID: 1253109987}
 --- !u!1 &1015178804
 GameObject:
   m_ObjectHideFlags: 0
@@ -1049,9 +1065,6 @@ MonoBehaviour:
   _loadFilesButton: {fileID: 1015178806}
   _loadingInProgressIcon: {fileID: 441914718}
   _loadedIcon: {fileID: 1852803653}
-  _loadedFilesContainer: {fileID: 1253109987}
-  _songViewPrefab: {fileID: 6114082406878551350, guid: bf299934079d3e04a90e68c63aa0834f,
-    type: 3}
 --- !u!1 &1782372697
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,6 +1113,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _fileLoadView: {fileID: 1771061805}
+  _soundProcessingView: {fileID: 1014909380}
 --- !u!1 &1852803653
 GameObject:
   m_ObjectHideFlags: 0
