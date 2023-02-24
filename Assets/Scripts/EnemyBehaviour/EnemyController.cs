@@ -1,12 +1,15 @@
+using System;
 using System.Collections.Generic;
 
 using Cysharp.Threading.Tasks;
 
 using UnityEngine;
 
+using Object = UnityEngine.Object;
+
 namespace GuitarMan.EnemyBehaviour
 {
-    public class EnemyController
+    public class EnemyController : IDisposable
     {
         private readonly EnemySystemView _enemySystemView;
 
@@ -34,6 +37,16 @@ namespace GuitarMan.EnemyBehaviour
             _wallet = wallet;
             _randomizer = randomizer;
             _levelEventsModel = levelEventsModel;
+        }
+
+        void IDisposable.Dispose()
+        {
+            foreach (var pair in _subscriptionsByViews)
+            {
+                UnsubscribeView(pair.Key, pair.Value);
+            }
+
+            _subscriptionsByViews.Clear();
         }
 
         public void Initialize()
@@ -125,15 +138,18 @@ namespace GuitarMan.EnemyBehaviour
 
             view.TryKillTween();
 
-            foreach (var item in _subscriptionsByViews)
-            {
-                item.Key.CameToShelter -= item.Value.CameToShelterSubscription;
-                item.Key.CameToTarget -= item.Value.CameToTargetSubscription;
-                item.Key.PlayerEntered -= item.Value.PlayerEnteredSubscription;
-                item.Key.PlayerExited -= item.Value.PlayerExitedSubscription;
-            }
+            UnsubscribeView(view, _subscriptionsByViews[view]);
 
+            _subscriptionsByViews.Remove(view);
             Object.Destroy(view.gameObject);
+        }
+
+        private void UnsubscribeView(EnemyView view, SubscriptionContainer subscriptionContainer)
+        {
+            view.CameToShelter -= subscriptionContainer.CameToShelterSubscription;
+            view.CameToTarget -= subscriptionContainer.CameToTargetSubscription;
+            view.PlayerEntered -= subscriptionContainer.PlayerEnteredSubscription;
+            view.PlayerExited -= subscriptionContainer.PlayerExitedSubscription;
         }
     }
 }
