@@ -21,7 +21,8 @@ namespace GuitarMan.SoundsContainerBehaviour
 
         private readonly AudioSource _audioSource;
 
-        private readonly Dictionary<Action, SoundView> _soundPlayActionViews = new Dictionary<Action, SoundView>();
+        private readonly Dictionary<SoundView, SubscriptionContainer> _subscriptionsByViews =
+            new Dictionary<SoundView, SubscriptionContainer>();
 
         private readonly Dictionary<SoundView, AudioClip> _audioClipsByViews = new Dictionary<SoundView, AudioClip>();
 
@@ -33,22 +34,23 @@ namespace GuitarMan.SoundsContainerBehaviour
             _soundLoadEventsModel = soundLoadEventsModel;
             _menuAudioPlayer = menuAudioPlayer;
 
-            soundLoadEventsModel.AnalysisFinished += HandleAnalysisFinished;
+            soundLoadEventsModel.AnalysisFinished += UpdateSoundsList;
         }
 
         void IDisposable.Dispose()
         {
-            _soundLoadEventsModel.AnalysisFinished -= HandleAnalysisFinished;
+            _soundLoadEventsModel.AnalysisFinished -= UpdateSoundsList;
 
-            foreach (var pair in _soundPlayActionViews)
+            foreach (var pair in _subscriptionsByViews)
             {
-                pair.Value.SoundPlayClicked -= pair.Key;
+                pair.Key.SoundPlayClicked -= pair.Value.PlayClickedSubscription;
+                pair.Key.RemoveSoundClicked -= pair.Value.RemoveClickedSubscription;
             }
 
-            _soundPlayActionViews.Clear();
+            _subscriptionsByViews.Clear();
         }
 
-        private void HandleAnalysisFinished()
+        private void UpdateSoundsList()
         {
             var clips = _soundLoadEventsModel.GetLoadedClips();
 
@@ -58,12 +60,9 @@ namespace GuitarMan.SoundsContainerBehaviour
 
                 soundView.Initialize();
 
-                Action currentAction = () => HandleSoundPlayClicked(soundView);
+                SubscribeView(soundView);
 
-                _soundPlayActionViews.Add(currentAction, soundView);
                 _audioClipsByViews.Add(soundView, clip);
-
-                soundView.SoundPlayClicked += currentAction;
             }
 
             _soundLoadEventsModel.HandleSoundsListUpdated();
@@ -78,9 +77,39 @@ namespace GuitarMan.SoundsContainerBehaviour
             return songView;
         }
 
+        private void SubscribeView(SoundView view)
+        {
+            var subscriptionContainer = new SubscriptionContainer()
+            {
+                PlayClickedSubscription = () => HandleSoundPlayClicked(view),
+                RemoveClickedSubscription = () => HandleSoundRemoveClicked(view)
+            };
+
+            _subscriptionsByViews.Add(view, subscriptionContainer);
+
+            view.SoundPlayClicked += subscriptionContainer.PlayClickedSubscription;
+            view.RemoveSoundClicked += subscriptionContainer.RemoveClickedSubscription;
+        }
+
+        private void DestroyView(SoundView view)
+        {
+            var target = view.gameObject;
+
+            _subscriptionsByViews.Remove(view);
+            _audioClipsByViews.Remove(view);
+
+            target.SetActive(false);
+            Object.Destroy(target);
+        }
+
         private void HandleSoundPlayClicked(SoundView view)
         {
             _menuAudioPlayer.PlayClip(_audioClipsByViews[view]);
+        }
+
+        private void HandleSoundRemoveClicked(SoundView view)
+        {
+            DestroyView(view);
         }
     }
 }
