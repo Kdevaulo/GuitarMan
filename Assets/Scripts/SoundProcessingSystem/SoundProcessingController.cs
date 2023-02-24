@@ -9,25 +9,16 @@ using DSPLib;
 
 using UnityEngine;
 
-using Object = UnityEngine.Object;
-
 namespace GuitarMan.SoundProcessingSystem
 {
     public class SoundProcessingController : IDisposable
     {
         private readonly SoundLoadEventsModel _soundLoadEventsModel;
 
-        private readonly Transform _loadedFilesContainer;
-
-        private readonly SoundView _soundViewPrefab;
-
         private List<SoundSpectrumData> _soundSpectrumDataCollection = new List<SoundSpectrumData>();
 
-        public SoundProcessingController(SoundProcessingView soundProcessingView,
-            SoundLoadEventsModel soundLoadEventsModel)
+        public SoundProcessingController(SoundLoadEventsModel soundLoadEventsModel)
         {
-            _loadedFilesContainer = soundProcessingView.LoadedFilesContainer;
-            _soundViewPrefab = soundProcessingView.SoundViewPrefab;
             _soundLoadEventsModel = soundLoadEventsModel;
 
             soundLoadEventsModel.AudioClipsLoaded += HandleClipsLoaded;
@@ -41,8 +32,8 @@ namespace GuitarMan.SoundProcessingSystem
         private void HandleClipsLoaded()
         {
             var audioClips = _soundLoadEventsModel.GetLoadedClips();
-
-            AnalyzeSoundsAsync(audioClips).Forget();
+            var target = new List<AudioClip>(audioClips);
+            AnalyzeSoundsAsync(target).Forget();
         }
 
         private async UniTask AnalyzeSoundsAsync(List<AudioClip> audioClips)
@@ -61,11 +52,9 @@ namespace GuitarMan.SoundProcessingSystem
                 thread.Start();
 
                 await UniTask.WaitUntil(() => thread.ThreadState == ThreadState.Stopped);
-
-                CreateView(clip);
             }
 
-            _soundLoadEventsModel.HandleAnalysisFinished();
+            _soundLoadEventsModel.HandleAnalysisFinished(_soundSpectrumDataCollection);
         }
 
         private void AddSpectrumData(in float[] samples, int numChannels, int numTotalSamples, int frequency,
@@ -135,13 +124,6 @@ namespace GuitarMan.SoundProcessingSystem
         private float GetTimeFromIndex(int index, int sampleRate)
         {
             return 1f / sampleRate * index;
-        }
-
-        private void CreateView(AudioClip audioClip)
-        {
-            // todo: add dynamic scroll area update while adding new item
-            var songView = Object.Instantiate(_soundViewPrefab, _loadedFilesContainer);
-            songView.SetText(audioClip.name);
         }
     }
 }

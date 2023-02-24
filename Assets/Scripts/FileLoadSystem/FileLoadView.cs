@@ -4,8 +4,6 @@ using Cysharp.Threading.Tasks;
 
 using DG.Tweening;
 
-using TMPro;
-
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -34,6 +32,11 @@ namespace GuitarMan.FileLoadSystem
         void IDisposable.Dispose()
         {
             _loadFilesButton.onClick.RemoveListener(HandleButtonClick);
+        }
+
+        public void SetButtonState(bool state)
+        {
+            _loadFilesButton.enabled = state;
         }
 
         public void VisualizeLoadFinished()

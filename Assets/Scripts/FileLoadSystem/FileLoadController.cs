@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Cysharp.Threading.Tasks;
 
@@ -27,13 +26,13 @@ namespace GuitarMan.FileLoadSystem
             _soundLoadEventsModel = soundLoadEventsModel;
 
             fileLoadView.LoadButtonClicked += HandleLoadButtonClick;
-            soundLoadEventsModel.AnalysisFinished += HandleAnalysisFinished;
+            soundLoadEventsModel.SoundsListUpdated += HandleSoundsListUpdated;
         }
 
         void IDisposable.Dispose()
         {
             _fileLoadView.LoadButtonClicked -= HandleLoadButtonClick;
-            _soundLoadEventsModel.AnalysisFinished -= HandleAnalysisFinished;
+            _soundLoadEventsModel.SoundsListUpdated -= HandleSoundsListUpdated;
         }
 
         public void Initialize()
@@ -54,6 +53,7 @@ namespace GuitarMan.FileLoadSystem
         private void HandlePathsSelected(string[] paths)
         {
             LoadFilesAsync(paths).Forget();
+            _fileLoadView.SetButtonState(false);
         }
 
         private void HandleDialogCancelled()
@@ -61,14 +61,17 @@ namespace GuitarMan.FileLoadSystem
             _fileLoadView.VisualizeLoadFinished();
         }
 
-        private void HandleAnalysisFinished()
+        private void HandleSoundsListUpdated()
         {
             _fileLoadView.VisualizeLoadFinished();
+            _fileLoadView.SetButtonState(true);
         }
 
         private async UniTask LoadFilesAsync(string[] paths)
         {
             _fileLoadView.VisualizeLoadStarted();
+
+            _loadedSounds.Clear();
 
             foreach (var path in paths)
             {
