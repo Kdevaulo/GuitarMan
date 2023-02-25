@@ -18,7 +18,7 @@ namespace GuitarMan.PlayerBehaviour
 
             _playerNavigation.Move(direction);
             _playerNavigation.Rotate(direction);
-            
+
             _playerAnimation.Move(direction);
         }
     }

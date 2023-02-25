@@ -13,6 +13,7 @@ namespace GuitarMan.AudioPlayerSystem
 
         public void PlayClip(AudioClip clip)
         {
+            // todo: now clip plays ones, need to think about cycles or playing "standart" music after chosen finished
             _audioSource.clip = clip;
             _audioSource.Play();
         }
