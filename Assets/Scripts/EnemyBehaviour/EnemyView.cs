@@ -12,7 +12,7 @@ namespace GuitarMan.EnemyBehaviour
 {
     [AddComponentMenu(nameof(EnemyBehaviour) + "/" + nameof(EnemyView)),
      RequireComponent(typeof(Collider), typeof(Rigidbody))]
-    public class EnemyView : MonoBehaviour, IDisposable
+    public class EnemyView : MonoBehaviour
     {
         public event Action PlayerEntered = delegate { };
         public event Action PlayerExited = delegate { };
@@ -37,7 +37,7 @@ namespace GuitarMan.EnemyBehaviour
             TryInvokeCollisionEvent(target, PlayerExited);
         }
 
-        void IDisposable.Dispose()
+        private void OnDestroy()
         {
             TryKillTween();
             _currentTween = null;

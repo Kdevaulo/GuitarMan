@@ -11,6 +11,8 @@ namespace GuitarMan
     [AddComponentMenu(nameof(GuitarMan) + "/" + nameof(MenuStartup))]
     public class MenuStartup : MonoBehaviour
     {
+        [SerializeField] private DisposableService _disposableService;
+
         [SerializeField] private FileLoadView _fileLoadView;
 
         [SerializeField] private SoundContainerView _soundContainerView;
@@ -40,12 +42,21 @@ namespace GuitarMan
             _fileLoadController = new FileLoadController(_fileLoadView, _soundLoadEventsModel);
             _soundProcessingController = new SoundProcessingController(_soundLoadEventsModel);
             _gamePlayModeController = new GamePlayModeController(_gamePlayModeView);
-            _soundsContainerController = new SoundsContainerController(_soundContainerView, _soundLoadEventsModel, _menuAudioPlayer);
+            _soundsContainerController =
+                new SoundsContainerController(_soundContainerView, _soundLoadEventsModel, _menuAudioPlayer);
+
+            _disposableService.Initialize(_soundsContainerController, _soundProcessingController, _fileLoadController,
+                _fileLoadView, _gamePlayModeView);
         }
 
         private void Start()
         {
             _fileLoadController.Initialize();
+        }
+
+        private void OnDestroy()
+        {
+            _disposableService.Dispose();
         }
     }
 }

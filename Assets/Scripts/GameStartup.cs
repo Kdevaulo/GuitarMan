@@ -10,6 +10,8 @@ namespace GuitarMan
     [AddComponentMenu(nameof(GuitarMan) + "/" + nameof(GameStartup))]
     public class GameStartup : MonoBehaviour
     {
+        [SerializeField] private DisposableService _disposableService;
+
         [SerializeField] private EnemySystemView _enemySystemView;
 
         [SerializeField] private WalletView _walletView;
@@ -34,12 +36,19 @@ namespace GuitarMan
             _walletService = new WalletService(_walletView);
 
             _awardController = new AwardController(_levelEventsModel, _walletService);
+
+            _disposableService.Initialize(_awardController, _enemyController);
         }
 
         private void Start()
         {
             _enemyController.Initialize();
             _enemyController.StartEnemySpawn();
+        }
+
+        private void OnDestroy()
+        {
+            _disposableService.Dispose();
         }
     }
 }

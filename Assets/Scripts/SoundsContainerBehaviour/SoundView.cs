@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace GuitarMan.SoundsContainerBehaviour
 {
-    public class SoundView : MonoBehaviour, IDisposable
+    public class SoundView : MonoBehaviour
     {
         public event Action SoundPlayClicked = delegate { };
         public event Action RemoveSoundClicked = delegate { };
@@ -18,7 +18,7 @@ namespace GuitarMan.SoundsContainerBehaviour
 
         [SerializeField] private Button _removeSoundButton;
 
-        void IDisposable.Dispose()
+        private void OnDestroy()
         {
             _playSoundButton.onClick.RemoveListener(HandlePlayButtonClick);
             _removeSoundButton.onClick.RemoveListener(HandleRemoveButtonClick);
