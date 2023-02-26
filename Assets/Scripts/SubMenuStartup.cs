@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace GuitarMan
 {
-    [AddComponentMenu(nameof(GuitarMan) + "/" + nameof(MenuStartup))]
-    public class MenuStartup : MonoBehaviour
+    [AddComponentMenu(nameof(GuitarMan) + "/" + nameof(SubMenuStartup))]
+    public class SubMenuStartup : MonoBehaviour
     {
         [SerializeField] private DisposableService _disposableService;
 
