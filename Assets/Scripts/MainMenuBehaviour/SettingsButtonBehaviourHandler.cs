@@ -1,4 +1,4 @@
-using System;
+using UnityEngine;
 
 namespace GuitarMan.MainMenuBehaviour
 {
@@ -10,7 +10,7 @@ namespace GuitarMan.MainMenuBehaviour
 
         protected override void HandleButtonClick()
         {
-            throw new NotImplementedException();
+            Debug.Log($"{nameof(SettingsButtonBehaviourHandler)} {nameof(HandleButtonClick)} — ShowSettings");
         }
     }
 }

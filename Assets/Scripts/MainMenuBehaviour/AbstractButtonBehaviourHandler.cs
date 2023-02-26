@@ -1,7 +1,8 @@
-using UnityEngine;
+using System;
 
 namespace GuitarMan.MainMenuBehaviour
 {
+    [Serializable]
     public abstract class AbstractButtonBehaviourHandler
     {
         private readonly MenuButtonView _buttonView;
@@ -32,12 +33,12 @@ namespace GuitarMan.MainMenuBehaviour
 
         private void HandlePointerEnter()
         {
-            Debug.Log("Pointer enter");
+            _buttonView.SetAnimationState(true);
         }
 
         private void HandlePointerExit()
         {
-            Debug.Log("Pointer exit");
+            _buttonView.SetAnimationState(false);
         }
     }
 }

@@ -16,6 +16,8 @@ namespace GuitarMan.MainMenuBehaviour
 
         public ButtonType ButtonType => _buttonType;
 
+        [SerializeField] private Animator _animator;
+
         [SerializeField] private ButtonType _buttonType;
 
         private Button _button;
@@ -34,13 +36,16 @@ namespace GuitarMan.MainMenuBehaviour
         void IPointerEnterHandler.OnPointerEnter(PointerEventData eventData)
         {
             ButtonPointerEnter.Invoke();
-            Debug.Log("PointerEnter");
         }
 
         void IPointerExitHandler.OnPointerExit(PointerEventData eventData)
         {
             ButtonPointerExit.Invoke();
-            Debug.Log("PointerExit");
+        }
+
+        public void SetAnimationState(bool state)
+        {
+            _animator.SetBool(MainMenuConstants.ButtonAnimatorParameter, state);
         }
 
         private void HandleButtonClick()

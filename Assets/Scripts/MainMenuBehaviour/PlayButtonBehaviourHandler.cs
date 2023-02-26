@@ -1,4 +1,4 @@
-using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace GuitarMan.MainMenuBehaviour
 {
@@ -10,7 +10,8 @@ namespace GuitarMan.MainMenuBehaviour
 
         protected override void HandleButtonClick()
         {
-            Debug.Log($"{ButtonType} - Change Scene");
+            // todo: change to async load|unload with loading screen
+            SceneManager.LoadScene("Scenes/FileDialog");
         }
     }
 }

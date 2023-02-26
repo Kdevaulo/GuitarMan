@@ -11,13 +11,20 @@ namespace GuitarMan
 
         [SerializeField] private MainMenuView _mainMenuView;
 
+        [SerializeField] private ButtonBehaviourDependencyStorage _buttonDependencyStorage;
+
         private MenuButtonsController _menuButtonsController;
 
         private void Awake()
         {
-            _menuButtonsController = new MenuButtonsController(_mainMenuView);
+            _menuButtonsController = new MenuButtonsController(_buttonDependencyStorage, _mainMenuView);
 
             _disposableService.Initialize(_menuButtonsController);
+        }
+
+        private void Start()
+        {
+            _menuButtonsController.Initialize();
         }
 
         private void OnDestroy()
