@@ -202,7 +202,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1139588600}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &235731663
 GameObject:
@@ -734,7 +734,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1139588600}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &747920963
 GameObject:
@@ -1678,6 +1678,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 804508308}
+  - {fileID: 2078343995}
   - {fileID: 212111490}
   - {fileID: 1161470418}
   - {fileID: 730868850}
@@ -1698,8 +1699,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _disposableService: {fileID: 804508307}
   _mainMenuView: {fileID: 1161470422}
-  _buttonDependencyStorage: {fileID: 11400000, guid: 6507a7ca08703ad42b1b31f5f926167a,
-    type: 2}
+  _buttonDependencyStorage: {fileID: 2078343994}
 --- !u!1 &1161470417
 GameObject:
   m_ObjectHideFlags: 0
@@ -1737,7 +1737,7 @@ RectTransform:
   - {fileID: 1997816215}
   - {fileID: 491260360}
   m_Father: {fileID: 1139588600}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2198,6 +2198,58 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -85}
   m_SizeDelta: {x: 1200, y: 1000}
   m_Pivot: {x: 0, y: 0.5}
+--- !u!1 &2078343993
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2078343995}
+  - component: {fileID: 2078343994}
+  m_Layer: 0
+  m_Name: ButtonBehaviourDependencies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2078343994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078343993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 120d9df09ab54fd6bf43925b99c33ff8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _handlersByButtonTypes:
+  - BehaviourHandler: {fileID: 11400000, guid: cb4e40eeb93cae847818296003762250, type: 2}
+    ButtonType: 0
+  - BehaviourHandler: {fileID: 11400000, guid: dff56aa9807395a47b45e7d66dacfb2b, type: 2}
+    ButtonType: 1
+  - BehaviourHandler: {fileID: 11400000, guid: 612bb11386a845a468827dd95f761388, type: 2}
+    ButtonType: 2
+  - BehaviourHandler: {fileID: 11400000, guid: 8f58062afc13c3d4bae159931f99e288, type: 2}
+    ButtonType: 3
+--- !u!4 &2078343995
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2078343993}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1139588600}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2135179215
 GameObject:
   m_ObjectHideFlags: 0
