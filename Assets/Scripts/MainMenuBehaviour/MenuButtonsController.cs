@@ -7,6 +7,8 @@ namespace GuitarMan.MainMenuBehaviour
 {
     public class MenuButtonsController : IDisposable
     {
+        private readonly SceneManagerService _sceneManagerService;
+
         private readonly ButtonBehaviourDependencyStorage _buttonDependencyStorage;
 
         private readonly MainMenuView _mainMenuView;
@@ -14,9 +16,10 @@ namespace GuitarMan.MainMenuBehaviour
         private readonly List<AbstractButtonBehaviourHandler> _buttonBehaviourHandlers =
             new List<AbstractButtonBehaviourHandler>();
 
-        public MenuButtonsController(ButtonBehaviourDependencyStorage buttonDependencyStorage,
-            MainMenuView mainMenuView)
+        public MenuButtonsController(SceneManagerService sceneManagerService,
+            ButtonBehaviourDependencyStorage buttonDependencyStorage, MainMenuView mainMenuView)
         {
+            _sceneManagerService = sceneManagerService;
             _buttonDependencyStorage = buttonDependencyStorage;
             _mainMenuView = mainMenuView;
         }
@@ -33,13 +36,11 @@ namespace GuitarMan.MainMenuBehaviour
         {
             foreach (var view in _mainMenuView.ButtonViews)
             {
-                var rawHandler = _buttonDependencyStorage.GetHandler(view.ButtonType);
-
-                var behaviourHandler =
-                    Activator.CreateInstance(rawHandler.GetClass(), args: view) as AbstractButtonBehaviourHandler;
+                var behaviourHandler = _buttonDependencyStorage.GetHandler(view.ButtonType);
 
                 Assert.IsNotNull(behaviourHandler, $"{nameof(MenuButtonsController)} {nameof(Initialize)}");
 
+                behaviourHandler.Initialize(_sceneManagerService, view);
                 behaviourHandler.SubscribeView();
 
                 _buttonBehaviourHandlers.Add(behaviourHandler);

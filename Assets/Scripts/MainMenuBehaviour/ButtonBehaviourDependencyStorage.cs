@@ -1,20 +1,17 @@
 using System.Linq;
 using System.Reflection;
 
-using UnityEditor;
-
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace GuitarMan.MainMenuBehaviour
 {
-    [CreateAssetMenu(fileName = nameof(ButtonBehaviourDependencyStorage),
-        menuName = nameof(MainMenuBehaviour) + "/" + nameof(ButtonBehaviourDependencyStorage))]
-    public class ButtonBehaviourDependencyStorage : ScriptableObject
+    [AddComponentMenu(nameof(MainMenuBehaviour) + "/" + nameof(ButtonBehaviourDependencyStorage))]
+    public class ButtonBehaviourDependencyStorage : MonoBehaviour
     {
         [SerializeField] private HandlerByButtonType[] _handlersByButtonTypes;
 
-        public MonoScript GetHandler(ButtonType buttonType)
+        public AbstractButtonBehaviourHandler GetHandler(ButtonType buttonType)
         {
             var targetData = _handlersByButtonTypes.FirstOrDefault(x => x.ButtonType == buttonType);
 
@@ -24,11 +21,11 @@ namespace GuitarMan.MainMenuBehaviour
 
             var behaviourHandler = targetData.BehaviourHandler;
 
-            Assert.IsTrue(behaviourHandler.GetClass().GetTypeInfo().BaseType == typeof(AbstractButtonBehaviourHandler),
+            Assert.IsTrue(behaviourHandler.GetType().GetTypeInfo().BaseType == typeof(AbstractButtonBehaviourHandler),
                 $"{nameof(ButtonBehaviourDependencyStorage)} {nameof(GetHandler)} " +
                 $"— Attached script must be inherited from {nameof(AbstractButtonBehaviourHandler)}");
 
-            return targetData.BehaviourHandler;
+            return targetData.BehaviourHandler as AbstractButtonBehaviourHandler;
         }
     }
 }

@@ -1,6 +1,7 @@
 using GuitarMan.MainMenuBehaviour;
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GuitarMan
 {
@@ -15,9 +16,17 @@ namespace GuitarMan
 
         private MenuButtonsController _menuButtonsController;
 
+        private SceneManagerService _sceneManagerService;
+
         private void Awake()
         {
-            _menuButtonsController = new MenuButtonsController(_buttonDependencyStorage, _mainMenuView);
+            _sceneManagerService = FindObjectOfType<SceneManagerService>();
+
+            Assert.IsNotNull(_sceneManagerService,
+                $"{nameof(MainMenuStartup)} {nameof(Awake)} _sceneManagerService == null");
+
+            _menuButtonsController =
+                new MenuButtonsController(_sceneManagerService, _buttonDependencyStorage, _mainMenuView);
 
             _disposableService.Initialize(_menuButtonsController);
         }

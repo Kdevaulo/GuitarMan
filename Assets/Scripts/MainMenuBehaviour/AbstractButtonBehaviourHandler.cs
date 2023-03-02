@@ -1,17 +1,23 @@
 using System;
 
+using UnityEngine;
+
 namespace GuitarMan.MainMenuBehaviour
 {
+    // note: createAssetMenu attribute need to be at inheritors
     [Serializable]
-    public abstract class AbstractButtonBehaviourHandler
+    public abstract class AbstractButtonBehaviourHandler : ScriptableObject
     {
-        private readonly MenuButtonView _buttonView;
+        private MenuButtonView _buttonView;
 
-        protected readonly ButtonType ButtonType;
+        protected SceneManagerService SceneManagerService;
 
-        protected AbstractButtonBehaviourHandler(MenuButtonView buttonView)
+        protected ButtonType ButtonType;
+
+        public void Initialize(SceneManagerService sceneManagerService, MenuButtonView buttonView)
         {
             _buttonView = buttonView;
+            SceneManagerService = sceneManagerService;
             ButtonType = buttonView.ButtonType;
         }
 

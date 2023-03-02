@@ -1,13 +1,13 @@
 using System;
 
-using UnityEditor;
+using UnityEngine;
 
 namespace GuitarMan.MainMenuBehaviour
 {
     [Serializable]
     public class HandlerByButtonType
     {
-        public MonoScript BehaviourHandler;
+        public ScriptableObject BehaviourHandler;
 
         public ButtonType ButtonType;
     }

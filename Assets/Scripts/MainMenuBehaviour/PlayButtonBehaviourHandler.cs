@@ -1,17 +1,19 @@
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace GuitarMan.MainMenuBehaviour
 {
+    [CreateAssetMenu(fileName = nameof(PlayButtonBehaviourHandler),
+        menuName = nameof(MainMenuBehaviour) + "/" + nameof(PlayButtonBehaviourHandler))]
     public sealed class PlayButtonBehaviourHandler : AbstractButtonBehaviourHandler
     {
-        public PlayButtonBehaviourHandler(MenuButtonView buttonView) : base(buttonView)
-        {
-        }
+        private const int CurrentSceneBuildIndex = 1;
+
+        private const int TargetSceneBuildIndex = 2;
 
         protected override void HandleButtonClick()
         {
-            // todo: change to async load|unload with loading screen
-            SceneManager.LoadScene("Scenes/FileDialog");
+            SceneManagerService.SwitchScene(CurrentSceneBuildIndex, TargetSceneBuildIndex, LoadSceneMode.Additive);
         }
     }
 }
